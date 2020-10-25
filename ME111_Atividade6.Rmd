@@ -1,0 +1,108 @@
+---
+title: "ME111 - Atividade 6"
+author: 'Milena Lumi Hangai/RA: 184654'
+date: "17/05/2020"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+source("http://www.openintro.org/stat/data/cdc.R")
+cdc$exerany = factor(cdc$exerany, levels = c(0,1), labels = c("não", "sim"))
+cdc$genhlth = factor(cdc$genhlth, levels = c("excellent", "very good", "good", "fair", "poor"), labels = c("Excelente", "Muito bom", "Bom", "Fraco", "Ruim"))
+```
+
+1. a) A variável genhlth é uma variável categórica ordinal e a variável exerany é uma variável categórica nominal.
+A variável genhlth está representada de maneira correta no data frame, com resultados entre “excelente”, “muito bom”, “bom”, “fraco” e “ruim”. Já a variável exerany, ao invés de estar representada com “yes” e “no”, ela está representada através de “1” e “0”, que significam respectivamente "sim" e "não". Portanto, a variável exerany não está representada corretamente no data frame.
+
+
+b) 
+
+```{r}
+barplot(table(cdc$genhlth), col = "red", main = "Gráfico em barras da variável genhlth")
+```
+
+c)
+```{r}
+table1 <- table(cdc[c(1, 2)])
+addmargins(table1)
+```
+d) Na tabela de contingência acima, os números no interior da tabela, mostram a quantidade de pessoas que se encaixam em cada “situação”. Por exemplo, um número no interior da tabela é o 1731, este, mostra que dentro da pesquisa realizada, 1731 pessoas se encaixam na situação de saúde geral boa (resposta “bom” em genhlth), e ao mesmo tempo não se exercitou no último mês (resposta “não” em exerany).
+Sem contar com as caselas das somas, a casela com o maior número é a de “muito bom” (de genhlth) x “sim” (de exerany), com um valor de 5620. Contando com as caselas das somas, a casela com o maior número seria aquela que contabiliza a soma de todos os participantes independentemente das respostas que eles deram, ou seja, seria a casela que indica 20000.
+A casela com o menor número é a de “ruim” (de genhlth) x “sim” (de exerany), com um valor de 293 pessoas.
+
+e)
+```{r}
+addmargins(prop.table(table1, margin=2), 1)
+table2 <- addmargins(prop.table(table1, margin=2), 1)
+```
+
+f) 
+```{r}
+barplot(table2, beside = TRUE, col = c("red", "yellow", "orange", "green", "blue", "cyan"), xlim = c(0, 25))
+legend(x = 15, y = 0.8, c("Excelente", "Muito bom", "Bom", "Fraco", "Ruim", "Soma"), fill = c("red", "yellow", "orange", "green", "blue", "cyan"))
+
+```
+
+```{r}
+chisq.test(table1)
+```
+
+g)Testando H0 como a hipótese de que as variáveis "genhlth" e "exerany" não possuem qualquer tipo de associação e H1 como a hipótese de que há relação entre as duas variáveis, obtemos o valor-de-p=2,2x10^-16. 
+Logo, percebemos que podemos rejeitar a hipótese H0, na qual as variáveis "genhlth" e "exerany" não apresentam nenhuma relação.
+Portanto, concluímos que as variáveis da situação apresentam uma correlação entre elas.
+
+2. a)
+```{r}
+table3 <- table(cdc[c(4, 9)])
+addmargins(prop.table(table3, margin=2), 1)
+```
+
+b)
+```{r}
+barplot(table3, beside = TRUE, names.arg = c("Male", "Female"), col = c("yellow", "black"), xlim = c(0, 20))
+legend(x = 7, y = 3000, c("Já fumou mais de 100 cigarros","Não fumou mais de 100 cigarros"), fill = c("black", "yellow"))
+```
+
+3. a)
+```{r}
+cdc["IBM"] <- cdc$weight/cdc$height^2 
+```
+
+b) A correlação da variável peso com a variável IMC é de 0,84.
+Sim, acredito que o peso está muito ligado com o IMC. Se uma pessoa está muito acima do peso, ou muito abaixo do peso, o IMC dela tende a variar de acima do normal ou abaixo do normal, respectivamente. Já é esperado que as duas variáveis estejam associadas devido a fórmula dada também. Onde o IMC = peso/altura².
+```{r}
+cor(cdc$weight, cdc$IBM)
+```
+
+c)
+```{r}
+library("ggplot2")
+```
+
+```{r}
+ggplot(cdc, aes(x = weight, y = IBM)) + geom_point()
+```
+
+O gráfico mostra que há uma concentração de casos de peso baixo e IMC (IBM) baixo e casos de peso médio e IMC médio. Existem poucas pessoas com peso alto e IMC alto.
+Apesar da correlação ser alta entre as duas variáveis, podemos notar que devemos tomar cuidado com esse caso. Se traçássemos uma reta que melhor define essa situação, não podemos esperar que os 20000 pontos estejam espalhados de maneira igualitária no gráfico e sim, que estejam concentrados na parte de peso baixo com IMC baixo e peso médio com IMC médio.
+
+
+4. a) cada nível da variável "genhlth", em relação a variável "age", temos as seguintes estatísticas sumárias:
+```{r}
+tapply(cdc$age, cdc$genhlth, summary)
+```
+
+b) 
+```{r}
+boxplot(cdc$age ~ cdc$genhlth, ylab = "Age", xlab = "Genhlth", col = c("red", "yellow", "orange", "green", "blue"))
+```
+
+A primeira diferença que notamos entre os boxplots de idade por níveis de saúde, é que conforme a idade aumenta, há uma maior quantidade de pessoas que designam seu nível da saúde como pior. Por exemplo, no boxplot do nível excelente, temos uma caixa que vai aproximadamente dos 30 anos até os 50 anos, enquanto no boxplot de nível ruim, a caixa vai de aproximadamente de 50 até 70 anos.
+Podemos perceber que o nível de saúde que tem a maior amplitude de idade é o nível "bom", pois sua "cauda" é maior e mais abrangente de todas.
+Nota-se também que os únicos níveis de saúde que possuem outliers são os níveis "excelente" e "muito bom", e são pessoas maiores de 80 anos. Isso demonstra como essas pessoas maiores de 80 anos saem da maioria das pessoas que tiveram as mesmas respostas. 
+
+
+5. Nessa atividade, foi possível focar na análise conjunta de duas variáveis diferentes simultaneamente. Foi muito interessante o aprendizado e a aplicação das diferentes funções no R, notei que há um grande repertório de análises possíveis de fazer só com o material disponível até o momento.
+A relação entre a variável "smoke100" e "gender" no exercício 2, não pode ser confirmada com certeza através do gráfico, mas podemos ver que de todas as pessoas que já fumaram mais de 100 cigarros na vida, a maioria são homens, e das pessoas que não fumaram mais de 100 cigarros na vida, a maioria são mulheres. Porém, ser do gênero masculino, biologicamente, não te faz mais propício a fumar, portanto, acredito que há uma variável de confundimento nessa situação e, se eu pudesse "chutar" algo, seria o grau de influência da sociedade na vida de cada pessoa.
